@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEO Engine OS v9.2 — Growth Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    .hero-gradient { background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 50%, #f8fafc 100%); }
+    .dark .hero-gradient { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); }
+  </style>
+</head>
+<body class="bg-[#fcfcfd] dark:bg-[#090d16] text-slate-900 dark:text-slate-100 h-screen overflow-hidden font-sans flex flex-col">
+
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-brand-600 text-white font-semibold text-xs px-4 py-3 rounded-xl shadow-xl items-center gap-2">
+    <span id="toastMsg">Completed</span>
+  </div>
+
+  <div class="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileSidebar(true)" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-sm">☰</button>
+      <div class="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center text-white font-black text-xs">✦</div>
+      <span class="font-bold text-sm text-brand-600 dark:text-indigo-400">SEO Engine OS</span>
+    </div>
+    <button onclick="runVisualSequence()" class="bg-brand-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">▶ Run Agents</button>
+  </div>
+
+  <div id="mobileOverlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <aside id="appSidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 flex flex-col justify-between shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out select-none">
+      <div class="flex flex-col flex-1 overflow-hidden">
+        <div class="px-5 pt-4 pb-3 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center text-white font-black text-xs shadow-sm">✦</div>
+            <span class="font-bold text-base tracking-tight text-brand-600 dark:text-indigo-400">SEO Engine OS</span>
+          </div>
+          <button onclick="toggleMobileSidebar(false)" class="lg:hidden text-slate-400 hover:text-slate-700 text-sm">✕</button>
+        </div>
+
+        <div class="px-3 mb-3 relative">
+          <button onclick="toggleProjectDropdown()" class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-between shadow-sm hover:border-brand-500 transition">
+            <div class="flex items-center gap-2 truncate">
+              <span id="projectDot" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+              <span id="currentProjectLabel" class="truncate font-semibold">companaya.com</span>
+            </div>
+            <span class="text-slate-400">⌄</span>
+          </button>
+          <div id="projectDropdownMenu" class="hidden absolute left-3 right-3 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1.5 z-50 text-xs">
+            <button onclick="switchProject('ALL')" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium text-slate-500">
+              <span>🌐 All Websites (Global Overview)</span>
+              <span id="check-ALL" class="hidden text-brand-600 font-bold">✓</span>
+            </button>
+            <div class="border-t border-slate-100 dark:border-slate-800 my-1"></div>
+            <div id="projectListItems" class="max-h-40 overflow-y-auto"></div>
+            <div class="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1 px-1.5">
+              <button onclick="toggleProjectDropdown();toggleModal(true)" class="w-full text-left px-2.5 py-2 rounded-lg text-brand-600 dark:text-indigo-400 font-semibold hover:bg-brand-50 dark:hover:bg-slate-800 flex items-center gap-2">
+                <span>+</span><span>Add New Website Profile</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-3 space-y-0.5 text-[13px]">
+          <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Main Dashboard</div>
+
+          <button onclick="selectNav('HOME')" id="nav-HOME" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-semibold flex items-center justify-start gap-3 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+            <span class="truncate">Home</span>
+          </button>
+
+          <button onclick="selectNav('ANALYTICS')" id="nav-ANALYTICS" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            <span class="truncate">Analytics</span>
+          </button>
+
+          <button onclick="selectNav('AI_VISIBILITY')" id="nav-AI_VISIBILITY" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="truncate">AI Search Visibility</span>
+          </button>
+
+          <button onclick="selectNav('TECH_SEO')" id="nav-TECH_SEO" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span class="truncate">Technical SEO</span>
+          </button>
+
+          <button onclick="selectNav('WEBSITE_AUDIT')" id="nav-WEBSITE_AUDIT" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="truncate">Website Audit</span>
+          </button>
+
+          <button onclick="selectNav('KEYWORDS_CONTENT')" id="nav-KEYWORDS_CONTENT" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span class="truncate">Keywords & Content</span>
+          </button>
+
+          <div id="profileOnlyIntegrationsWrap">
+            <button onclick="selectNav('INTEGRATIONS')" id="nav-INTEGRATIONS" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-between text-brand-600 dark:text-indigo-400 hover:bg-brand-50/60 dark:hover:bg-slate-800/50">
+              <div class="flex items-center gap-3 truncate">
+                <svg class="w-4 h-4 shrink-0 text-brand-600 dark:text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <span class="truncate">GSC, GA4 & Bing</span>
+              </div>
+              <span id="sidebarIntCount" class="text-[10px] bg-emerald-50 dark:bg-emerald-950 text-emerald-600 px-1.5 py-0.5 rounded font-bold shrink-0">3/3</span>
+            </button>
+          </div>
+
+          <button onclick="selectNav('LEARNING')" id="nav-LEARNING" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.5 2.5 6.5 6 7.5V21h4v-3.5c3.5-1 6-4 6-7.5a8 8 0 0 0-8-8z"/></svg>
+            <span class="truncate">Agent Prompt Learning</span>
+          </button>
+
+          <button onclick="selectNav('SETTINGS')" id="nav-SETTINGS" class="main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span class="truncate">Settings & API Keys</span>
+          </button>
+
+          <div class="pt-4 pb-1 px-3 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Audit Logs & Agents</span>
+            <span id="sidebarLogBadge" class="text-[10px] bg-brand-50 dark:bg-indigo-950 text-brand-600 dark:text-indigo-300 font-bold px-1.5 py-0.5 rounded">18</span>
+          </div>
+          <button onclick="selectNav('LOGS')" id="nav-LOGS" class="agent-nav-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between text-slate-700 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/50">
+            <span class="truncate">📋 Master Task Audit Logs</span>
+            <span class="text-[10px] bg-emerald-50 dark:bg-emerald-950 text-emerald-600 px-1.5 py-0.5 rounded font-bold shrink-0">Live</span>
+          </button>
+
+          <div class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Individual Agents (01–16)</div>
+          <div id="agentSidebarItems" class="space-y-0.5 pb-4"></div>
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-slate-200/80 dark:border-slate-800 space-y-2">
+        <button onclick="runVisualSequence()" class="w-full bg-gradient-to-r from-brand-500 to-purple-600 hover:from-brand-600 hover:to-purple-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition">
+          <span>✨</span><span id="runSwarmBtnText">Run All 16 Agents Live</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+      <header class="bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="headerIconBox" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-sm shrink-0">⊞</div>
+          <div>
+            <h1 id="headerTitle" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">Growth Center</h1>
+            <p id="headerSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Your search opportunity and autonomous 16-agent progress</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div id="headerProfileIntegrationsBar" class="flex items-center gap-1.5 mr-1">
+            <button onclick="selectNav('INTEGRATIONS')" id="pillGsc" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center gap-1.5 transition"></button>
+            <button onclick="selectNav('INTEGRATIONS')" id="pillGa4" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center gap-1.5 transition"></button>
+            <button onclick="selectNav('INTEGRATIONS')" id="pillBing" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center gap-1.5 transition"></button>
+          </div>
+
+          <label class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-lg text-xs cursor-pointer">
+            <input id="simulateFailureToggle" type="checkbox" checked onchange="fetchSwarmData()" class="accent-brand-600" />
+            <span class="font-medium text-slate-700 dark:text-slate-300">Test Jev Auto-Fix</span>
+          </label>
+          <button onclick="toggleDarkMode()" class="border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <span>☾</span><span id="themeToggleText">Dark</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div class="max-w-6xl mx-auto space-y-6">
+
+          <div id="view-HOME" class="view-section space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
+                  <div class="space-y-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600 dark:text-indigo-400 bg-brand-50 dark:bg-indigo-950 px-2.5 py-1 rounded-md">
+                      Hybrid System-1 (Jev) + System-2 (LLM) Active
+                    </span>
+                    <h2 id="homeBannerTitle" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white pt-1">
+                      companaya.com is recommended in 92% of tracked AI questions
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Connected to Google Search Console, GA4, and Bing Webmaster IndexNow. Click any agent in the left sidebar to inspect its work.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-2">
+                      <button onclick="selectNav('INTEGRATIONS')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition">
+                        Manage Site GSC, GA4 & Bing →
+                      </button>
+                      <button onclick="selectNav('LEARNING')" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-semibold px-4 py-2 rounded-full transition">
+                        View 10 Learned Master Prompts
+                      </button>
+                    </div>
+                  </div>
+                  <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-8 border-brand-500 flex flex-col items-center justify-center shrink-0 bg-brand-50/40 dark:bg-indigo-950/30 mx-auto sm:mx-0">
+                    <span class="text-2xl font-extrabold text-brand-600 dark:text-indigo-400">98%</span>
+                    <span class="text-[10px] font-semibold text-slate-500 uppercase">Jev Safety</span>
+                  </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900 dark:text-white">GSC + Bing Clicks & AI Recommendations</h3>
+                      <p class="text-xs text-slate-500">6-month trajectory across Google, Bing & AI Search (ChatGPT, Gemini, Perplexity)</p>
+                    </div>
+                    <span id="homeStackBadge" class="text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      WordPress Connected
+                    </span>
+                  </div>
+                  <canvas id="homeGrowthChart" height="115"></canvas>
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white">What Your Agents Just Did</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Tap any card to open that agent's tab</p>
+                </div>
+                <div class="space-y-2.5 text-xs">
+                  <div onclick="selectNav('A1')" class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-brand-500 cursor-pointer flex items-center justify-between">
+                    <div><div class="font-bold text-slate-800 dark:text-white">Agent 01: Easy Keywords Found</div><div class="text-slate-500">Weak competitors in Top 5</div></div>
+                    <span class="text-emerald-600 font-bold">Done ✓</span>
+                  </div>
+                  <div onclick="selectNav('A3')" class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-brand-500 cursor-pointer flex items-center justify-between">
+                    <div><div class="font-bold text-slate-800 dark:text-white">Agent 03: GSC & Bing Miner</div><div class="text-slate-500">Sorted queries via Jev 'choice'</div></div>
+                    <span class="text-emerald-600 font-bold">Done ✓</span>
+                  </div>
+                  <div onclick="selectNav('A8')" class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-brand-500 cursor-pointer flex items-center justify-between">
+                    <div><div class="font-bold text-slate-800 dark:text-white">Agent 08: Internal Link Builder</div><div class="text-slate-500">Linked new & old articles safely</div></div>
+                    <span class="text-emerald-600 font-bold">Done ✓</span>
+                  </div>
+                  <div onclick="selectNav('A9')" class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-brand-500 cursor-pointer flex items-center justify-between">
+                    <div><div class="font-bold text-slate-800 dark:text-white">Agent 09: Jev Spam & AdSense Gate</div><div class="text-slate-500">Jev Noul = 0.98 Safe</div></div>
+                    <span class="text-emerald-600 font-bold">Safe ✓</span>
+                  </div>
+                </div>
+
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <div class="text-xs font-bold text-slate-800 dark:text-white mb-2.5">Recent Jev Supervisor Fixes (Agent 16)</div>
+                  <div id="homeRecentLogs" class="space-y-2.5 text-xs"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="view-INTEGRATIONS" class="view-section hidden space-y-6">
+            <div class="hero-gradient border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+              <div class="space-y-1">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-md border border-indigo-100">
+                  Isolated Per-Website Credentials
+                </span>
+                <h2 id="intBannerHeading" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white pt-1">
+                  Search & Analytics Integrations for companaya.com
+                </h2>
+                <p class="text-xs text-slate-600 dark:text-slate-300 max-w-2xl">
+                  Connect Google Search Console (for Agent 03 3-Bucket Mining), Google Analytics 4 (for Agent 12 & 13 CRO/Engagement tracking), and Bing Webmaster Tools + IndexNow (for instant ChatGPT Search & Copilot citations).
+                </p>
+              </div>
+              <button onclick="saveSiteIntegrations()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow transition">
+                Save & Sync Site Integrations ✓
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 text-xs">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 flex items-center justify-center font-bold text-sm">G</div>
+                      <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">Google Search Console</div>
+                        <div class="text-[11px] text-slate-500">Powers Agent 03 (3-Bucket Miner)</div>
+                      </div>
+                    </div>
+                    <span id="badgeGsc" class="px-2.5 py-0.5 rounded-full font-bold text-[11px]"></span>
+                  </div>
+                  <div>
+                    <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">GSC Property URL</label>
+                    <input id="intGscUrl" placeholder="sc-domain:mysite.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                  </div>
+                  <div>
+                    <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Service Account / OAuth Email</label>
+                    <input id="intGscEmail" placeholder="seo-bot@project.iam.gserviceaccount.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                  </div>
+                </div>
+                <div id="syncNoteGsc" class="text-[11px] text-emerald-600 font-medium pt-2 border-t border-slate-100 dark:border-slate-800"></div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 flex items-center justify-center font-bold text-sm">GA4</div>
+                      <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">Google Analytics 4 (GA4)</div>
+                        <div class="text-[11px] text-slate-500">Powers Agent 12 & 13 (CRO & Decay)</div>
+                      </div>
+                    </div>
+                    <span id="badgeGa4" class="px-2.5 py-0.5 rounded-full font-bold text-[11px]"></span>
+                  </div>
+                  <div>
+                    <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">GA4 Measurement ID</label>
+                    <input id="intGa4Mid" placeholder="G-XXXXXXXXXX" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Property ID</label>
+                      <input id="intGa4Pid" placeholder="449182736" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                    </div>
+                    <div>
+                      <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">API Secret</label>
+                      <input id="intGa4Secret" type="password" placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                    </div>
+                  </div>
+                </div>
+                <div id="syncNoteGa4" class="text-[11px] text-emerald-600 font-medium pt-2 border-t border-slate-100 dark:border-slate-800"></div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-600 flex items-center justify-center font-bold text-sm">B</div>
+                      <div>
+                        <div class="font-bold text-slate-900 dark:text-white text-sm">Bing Webmaster + IndexNow</div>
+                        <div class="text-[11px] text-slate-500">Powers ChatGPT Search & Agent 06/10</div>
+                      </div>
+                    </div>
+                    <span id="badgeBing" class="px-2.5 py-0.5 rounded-full font-bold text-[11px]"></span>
+                  </div>
+                  <div>
+                    <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Bing Webmaster API Key</label>
+                    <input id="intBingKey" type="password" placeholder="bing_live_..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                  </div>
+                  <div>
+                    <label class="font-semibold text-slate-700 dark:text-slate-300 block mb-1">IndexNow Instant Ping Key</label>
+                    <input id="intBingIndexNow" placeholder="idx_mysite_2026" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                  </div>
+                </div>
+                <div id="syncNoteBing" class="text-[11px] text-emerald-600 font-medium pt-2 border-t border-slate-100 dark:border-slate-800"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="view-LEARNING" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">🧠 Train Your Agents: Add Custom SEO, AEO & CRO Prompts to Agent Memory</h2>
+                <p class="text-xs text-slate-500 mt-0.5">All 10 Master Prompts are pre-loaded below. Add any additional custom prompt or SOP rule to permanently train your agents.</p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="font-semibold text-slate-600 dark:text-slate-300 block mb-1">Target Agent to Train</label>
+                  <select id="learnAgentId" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5">
+                    <option value="A4">Agent 04: AI & Google Article Writer</option>
+                    <option value="A3">Agent 03: Search Console 3-Bucket Miner</option>
+                    <option value="A5">Agent 05: On-Page SEO & Image Optimizer</option>
+                    <option value="A8">Agent 08: Internal Link Builder (Hub & Spoke)</option>
+                    <option value="A9">Agent 09: Google Spam & AdSense Guard</option>
+                    <option value="A13">Agent 13: Conversion Rate Optimizer (CRO)</option>
+                    <option value="ALL">All 16 Agents (Global Rule)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="font-semibold text-slate-600 dark:text-slate-300 block mb-1">Rule / Prompt Title</label>
+                  <input id="learnTitle" placeholder="e.g., E-E-A-T Case Study Table Rule" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                </div>
+                <div>
+                  <label class="font-semibold text-slate-600 dark:text-slate-300 block mb-1">Scope</label>
+                  <select id="learnScope" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5">
+                    <option value="Global (All Profiles)">Global (All Website Profiles)</option>
+                    <option value="Active Website Profile Only">Active Website Profile Only</option>
+                  </select>
+                </div>
+                <div class="md:col-span-3">
+                  <label class="font-semibold text-slate-600 dark:text-slate-300 block mb-1">Prompt Instructions for Agent to Learn</label>
+                  <textarea id="learnText" rows="3" placeholder="Paste the exact SEO/AEO prompt or rule you want this agent to follow on every run..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-3"></textarea>
+                </div>
+              </div>
+              <div class="flex justify-end">
+                <button onclick="addAgentPrompt()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow">
+                  + Save Prompt to Agent Memory
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Active Master Prompts Learned by Your Agents (10 Loaded)</h3>
+              <div id="learnedPromptsList" class="space-y-3 text-xs"></div>
+            </div>
+          </div>
+
+          <div id="view-ANALYTICS" class="view-section hidden space-y-6">
+            <div class="hero-gradient border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 sm:p-8 text-center space-y-3">
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">See how your SEO is performing (GSC + GA4 + Bing)</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+                Agent 03 uses TypeSafe Jev's <code>choice</code> primitive to sort your Google Search Console and Bing Webmaster queries into 3 easy action buckets.
+              </p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 03: Your 3-Bucket Search Console & Bing Action Plan</h3>
+              <div id="analyticsBucketsCards" class="space-y-3 text-xs"></div>
+            </div>
+          </div>
+
+          <div id="view-AI_VISIBILITY" class="view-section hidden space-y-6">
+            <div class="hero-gradient border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 sm:p-8 text-center space-y-3">
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Find out if AI search recommends you</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+                Agent 10 tracks the questions your customers ask ChatGPT (via Bing), Google AI Overview, Perplexity, and Gemini.
+              </p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-3">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 10: Customer Questions & AI Recommendations</h3>
+              <div id="aiVisCardsList" class="space-y-3 text-xs"></div>
+            </div>
+          </div>
+
+          <div id="view-TECH_SEO" class="view-section hidden space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Agent 06: Technical Speed, Bing IndexNow & Rich Schema</h2>
+                <p class="text-xs text-slate-500">Checks your site speed, mobile layout, AI bot permissions, Bing IndexNow, and Google FAQ Schema.</p>
+              </div>
+              <button onclick="triggerSimulatedAuditCrash()" class="bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800 text-xs font-semibold px-3.5 py-2 rounded-xl">
+                Test Audit Error & Jev Auto-Fix
+              </button>
+            </div>
+            <div id="techErrorStateCard" class="hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-8 sm:p-12 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+              <div class="w-14 h-14 rounded-full border-4 border-red-500 text-red-500 flex items-center justify-center text-2xl font-bold mx-auto">✕</div>
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white">An error occurred during the audit</h3>
+              <p class="text-xs text-slate-500">Click below to let Agent 16 (TypeSafe Jev Router) automatically repair the timeout and unlock AI crawlers.</p>
+              <button onclick="healTechnicalAudit()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs py-3 rounded-xl shadow transition">
+                ↻ Retry Audit & Auto-Fix with Agent 16
+              </button>
+            </div>
+            <div id="techHealthyCard" class="space-y-3 text-xs"></div>
+          </div>
+
+          <div id="view-WEBSITE_AUDIT" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 05: On-Page SEO & Image Speed Checklist</h3>
+              <div id="auditOnpageList" class="space-y-3 text-xs"></div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 09: TypeSafe Jev Anti-Spam & AdSense Compliance Gate</h3>
+              <div id="auditComplianceList" class="space-y-3 text-xs"></div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 08: Automatic Internal Links Added (Hub & Spoke)</h3>
+              <div id="auditLinksList" class="space-y-3 text-xs"></div>
+            </div>
+          </div>
+
+          <div id="view-KEYWORDS_CONTENT" class="view-section hidden space-y-6">
+            <div class="hero-gradient border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-4 shadow-sm">
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">High-value keywords & instant page builder</h2>
+              <p class="text-xs text-slate-600 dark:text-slate-300 max-w-2xl">
+                Enter any topic below—Agent 04 applies your 10 learned Master Prompts to write the page, Agent 05 & 08 optimize headings and internal links, and Agent 09 + Agent 16 verify safety.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <input id="inputKeyword" type="text" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full px-4 py-2 text-xs w-full sm:w-72" placeholder="Enter target keyword..." />
+                <input id="inputTitle" type="text" class="hidden" />
+                <select id="inputPageType" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-full px-3 py-2 text-xs">
+                  <option value="comparison">Comparison Page</option>
+                  <option value="service">Service Page</option>
+                  <option value="calculator">Calculator Page</option>
+                </select>
+                <button onclick="runVisualSequence()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-5 py-2 rounded-full shadow transition">
+                  Write & Optimize Page →
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 01: Easy-to-Rank Keywords Ready for Your Website</h3>
+              <div id="kwCardsList" class="space-y-3 text-xs"></div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 04: Latest Generated Page Preview</h3>
+              <div id="kwArticlePreview" class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-5 text-xs space-y-3 max-h-96 overflow-y-auto"></div>
+            </div>
+          </div>
+
+          <div id="view-SETTINGS" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">🔑 Global AI Engine Keys (System-1 TypeSafe Jev + System-2 Writer)</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Paste your AI keys below. (To connect GSC, GA4, or Bing for an individual website, use the <strong>GSC, GA4 & Bing</strong> tab in the sidebar).</p>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">1. TypeSafe AI Jev Key (<code>TYPESAFE_API_KEY</code>)</label>
+                  <input id="keyTypesafe" type="password" placeholder="ts_live_... (Powers Agent 03, 09 & 16 Decisions)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">2. Google Gemini API Key (<code>GEMINI_API_KEY</code>)</label>
+                  <input id="keyGemini" type="password" placeholder="AIzaSy... (Powers Agent 04, 11 & 15 Writing)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">3. OpenAI API Key (Optional Alternative)</label>
+                  <input id="keyOpenai" type="password" placeholder="sk-proj-..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                </div>
+                <div>
+                  <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">4. Google PageSpeed Insights Key (Optional)</label>
+                  <input id="keyPagespeed" type="password" placeholder="AIzaSy..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5" />
+                </div>
+              </div>
+              <div class="flex items-center justify-between pt-2">
+                <div id="apiKeyStatusText" class="text-xs text-emerald-600 font-semibold">Running with calibrated local fallback (Add keys above for live API).</div>
+                <button onclick="saveApiKeys()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow">
+                  Save & Activate AI Keys
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Agent 07: Pages Staged & Ready to Publish to Your Website</h3>
+              <div id="settingsQueueList" class="space-y-3 text-xs"></div>
+            </div>
+          </div>
+
+          <div id="view-LOGS" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+              <div>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Master Agent Task Execution Logs</h2>
+                <p class="text-xs text-slate-500">Plain-English log of every task run by Agents 01–16 and how Agent 16 (TypeSafe Jev) fixed mistakes.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <button onclick="renderMasterLogs('ALL')" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 font-semibold">All Tasks</button>
+                <button onclick="renderMasterLogs('FAILED')" class="px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-300 font-semibold">Failed Tasks</button>
+                <button onclick="renderMasterLogs('REROUTED')" class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-300 font-semibold">Jev Auto-Transfers</button>
+                <button onclick="renderMasterLogs('SUCCEEDED')" class="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300 font-semibold">Succeeded</button>
+              </div>
+            </div>
+            <div id="masterLogsCardList" class="space-y-2.5 text-xs"></div>
+          </div>
+
+          <div id="view-AGENT" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+              <div class="space-y-1.5 max-w-2xl">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span id="agPillarTag" class="text-[11px] font-bold bg-brand-50 dark:bg-indigo-950 text-brand-600 dark:text-indigo-300 px-2.5 py-0.5 rounded-md"></span>
+                  <span id="agStatusTag" class="text-[11px] font-bold px-2.5 py-0.5 rounded-md"></span>
+                </div>
+                <h2 id="agHeading" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white pt-1"></h2>
+                <p id="agPlainSummary" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+              </div>
+              <button onclick="runVisualSequence()" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow shrink-0">
+                ↻ Run This Agent Again
+              </button>
+            </div>
+
+            <div id="agKpiCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">What This Agent Found & Did For Your Website</h3>
+              <div id="agVisualCardsBox" class="space-y-3 text-xs"></div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 space-y-3 shadow-sm">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Task History for This Agent</h3>
+              <div id="agLogsList" class="space-y-2.5 text-xs"></div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="siteModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white">Add New Website Profile</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div><label class="text-slate-500">Website Domain</label><input id="mDomain" placeholder="mywebsite.com" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 mt-1" /></div>
+        <div><label class="text-slate-500">Brand / Business Name</label><input id="mName" placeholder="My Business" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 mt-1" /></div>
+        <div>
+          <label class="text-slate-500">Website Platform</label>
+          <select id="mStack" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 mt-1">
+            <option value="wordpress">WordPress</option>
+            <option value="react">React / Next.js</option>
+            <option value="nodejs">Node.js</option>
+          </select>
+        </div>
+        <div><label class="text-slate-500">Your Main Service / Niche</label><input id="mNiche" placeholder="Home Cleaning / SaaS" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 mt-1" /></div>
+        <div class="sm:col-span-2"><label class="text-slate-500">Your Experience / Key Facts</label><textarea id="mNotes" rows="2" placeholder="Example: 10 years experience, 400+ happy clients, transparent pricing..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 mt-1"></textarea></div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="toggleModal(false)" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold">Cancel</button>
+        <button onclick="createSite()" class="px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-semibold">Add Website Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let SITES = [];
+    let CURRENT_SITE = null;
+    let IS_GLOBAL_MODE = false;
+    let SWARM_DATA = null;
+    let ACTIVE_NAV = 'HOME';
+    let homeChartInstance = null;
+
+    function notify(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('flex');
+      setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 3000);
+    }
+
+    function toggleMobileSidebar(show) {
+      const sb = document.getElementById('appSidebar');
+      const ov = document.getElementById('mobileOverlay');
+      if (show) { sb.classList.remove('-translate-x-full'); ov.classList.remove('hidden'); }
+      else { sb.classList.add('-translate-x-full'); ov.classList.add('hidden'); }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      document.getElementById('themeToggleText').textContent = isDark ? 'Light' : 'Dark';
+    }
+
+    function toggleProjectDropdown() {
+      document.getElementById('projectDropdownMenu').classList.toggle('hidden');
+    }
+
+    function badgeColors(color) {
+      if (color === 'emerald') return 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+      if (color === 'amber') return 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+      return 'bg-brand-50 dark:bg-indigo-950 text-brand-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800';
+    }
+
+    function renderVisualCardList(cards) {
+      return cards.map(c => `
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-slate-900 dark:text-white text-sm">${c.title}</div>
+            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${badgeColors(c.badge_color)}">${c.badge}</span>
+          </div>
+          <div class="text-xs font-semibold text-brand-600 dark:text-indigo-400">${c.subtitle}</div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${c.description}</p>
+          ${c.rich_html ? `<div class="mt-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 max-h-96 overflow-y-auto">${c.rich_html}</div>` : ''}
+          ${c.action_label ? `
+            <div class="pt-1">
+              <button onclick="${c.action_kw ? `quickWriteKeyword('${c.action_kw}')` : `this.textContent='Completed ✓';notify('Action applied!')`}" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition">
+                ${c.action_label}
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function quickWriteKeyword(kw) {
+      document.getElementById('inputKeyword').value = kw;
+      runVisualSequence().then(() => selectNav('A4'));
+    }
+
+    async function loadSites() {
+      const res = await fetch('/api/sites');
+      const data = await res.json();
+      SITES = data.sites;
+      if (SITES.length) {
+        CURRENT_SITE = SITES[0];
+        IS_GLOBAL_MODE = false;
+        renderProjectDropdown();
+        populateSiteDefaults();
+        await fetchSwarmData();
+        await loadLearnedPrompts();
+      }
+    }
+
+    function renderProjectDropdown() {
+      document.getElementById('currentProjectLabel').textContent = IS_GLOBAL_MODE ? 'All Websites (Global)' : CURRENT_SITE.domain;
+      document.getElementById('projectDot').className = IS_GLOBAL_MODE ? 'w-2 h-2 rounded-full bg-slate-400 shrink-0' : 'w-2 h-2 rounded-full bg-emerald-500 shrink-0';
+      document.getElementById('check-ALL').classList.toggle('hidden', !IS_GLOBAL_MODE);
+      document.getElementById('profileOnlyIntegrationsWrap').classList.toggle('hidden', IS_GLOBAL_MODE);
+      document.getElementById('headerProfileIntegrationsBar').classList.toggle('hidden', IS_GLOBAL_MODE);
+
+      document.getElementById('projectListItems').innerHTML = SITES.map(s => `
+        <button onclick="switchProject('${s.id}')" class="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between font-medium">
+          <span>${s.domain} <span class="text-[10px] text-slate-400 uppercase">(${s.tech_stack})</span></span>
+          ${(!IS_GLOBAL_MODE && s.id === CURRENT_SITE.id) ? '<span class="text-brand-600 font-bold">✓</span>' : ''}
+        </button>
+      `).join('');
+    }
+
+    async function switchProject(id) {
+      toggleProjectDropdown();
+      if (id === 'ALL') {
+        IS_GLOBAL_MODE = true;
+        renderProjectDropdown();
+        if (ACTIVE_NAV === 'INTEGRATIONS') selectNav('HOME');
+        notify('Switched to Global View (Select a website profile to configure GSC, GA4 & Bing)');
+        return;
+      }
+      IS_GLOBAL_MODE = false;
+      CURRENT_SITE = SITES.find(s => s.id === id);
+      renderProjectDropdown();
+      populateSiteDefaults();
+      await fetchSwarmData();
+      notify(`Active profile: ${CURRENT_SITE.domain}`);
+    }
+
+    function populateSiteDefaults() {
+      document.getElementById('homeBannerTitle').textContent = `${CURRENT_SITE.domain} is recommended in 92% of tracked AI questions`;
+      document.getElementById('homeStackBadge').textContent = `${CURRENT_SITE.tech_stack.toUpperCase()} Connected`;
+      document.getElementById('intBannerHeading').textContent = `Search & Analytics Integrations for ${CURRENT_SITE.domain}`;
+
+      const intg = CURRENT_SITE.integrations || {gsc:{}, ga4:{}, bing:{}};
+      document.getElementById('intGscUrl').value = intg.gsc.property_url || '';
+      document.getElementById('intGscEmail').value = intg.gsc.client_email || '';
+      document.getElementById('intGa4Mid').value = intg.ga4.measurement_id || '';
+      document.getElementById('intGa4Pid').value = intg.ga4.property_id || '';
+      document.getElementById('intGa4Secret').value = intg.ga4.api_secret || '';
+      document.getElementById('intBingKey').value = intg.bing.api_key || '';
+      document.getElementById('intBingIndexNow').value = intg.bing.indexnow_key || '';
+
+      updateIntegrationBadges(intg);
+
+      if (CURRENT_SITE.gsc_queries && CURRENT_SITE.gsc_queries[0]) {
+        const q = CURRENT_SITE.gsc_queries[0].query;
+        document.getElementById('inputKeyword').value = q;
+        document.getElementById('inputTitle').value = q.slice(0, 42).replace(/\b\w/g, c => c.toUpperCase()) + ' (2026 Guide)';
+      }
+      initHomeChart(CURRENT_SITE.traffic_series, CURRENT_SITE.ai_sov_series);
+    }
+
+    function updateIntegrationBadges(intg) {
+      const count = [intg.gsc?.connected, intg.ga4?.connected, intg.bing?.connected].filter(Boolean).length;
+      document.getElementById('sidebarIntCount').textContent = `${count}/3`;
+
+      const setPill = (id, label, connected) => {
+        const el = document.getElementById(id);
+        el.className = connected
+          ? 'px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5'
+          : 'px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1.5';
+        el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${connected ? 'bg-emerald-500' : 'bg-amber-500'}"></span><span>${label}: ${connected ? 'ON' : 'Setup'}</span>`;
+      };
+      setPill('pillGsc', 'GSC', intg.gsc?.connected);
+      setPill('pillGa4', 'GA4', intg.ga4?.connected);
+      setPill('pillBing', 'Bing', intg.bing?.connected);
+
+      const setCardBadge = (badgeId, noteId, obj) => {
+        const b = document.getElementById(badgeId);
+        b.textContent = obj?.connected ? 'Connected ✓' : 'Not Connected';
+        b.className = obj?.connected
+          ? 'px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-emerald-50 dark:bg-emerald-950 text-emerald-600'
+          : 'px-2.5 py-0.5 rounded-full font-bold text-[11px] bg-amber-50 dark:bg-amber-950 text-amber-600';
+        document.getElementById(noteId).textContent = obj?.last_synced || 'Enter credentials above to connect';
+      };
+      setCardBadge('badgeGsc', 'syncNoteGsc', intg.gsc);
+      setCardBadge('badgeGa4', 'syncNoteGa4', intg.ga4);
+      setCardBadge('badgeBing', 'syncNoteBing', intg.bing);
+    }
+
+    async function saveSiteIntegrations() {
+      const payload = {
+        site_id: CURRENT_SITE.id,
+        gsc_property_url: document.getElementById('intGscUrl').value,
+        gsc_client_email: document.getElementById('intGscEmail').value,
+        ga4_measurement_id: document.getElementById('intGa4Mid').value,
+        ga4_property_id: document.getElementById('intGa4Pid').value,
+        ga4_api_secret: document.getElementById('intGa4Secret').value,
+        bing_site_url: `https://${CURRENT_SITE.domain}`,
+        bing_api_key: document.getElementById('intBingKey').value,
+        bing_indexnow_key: document.getElementById('intBingIndexNow').value
+      };
+      const res = await fetch('/api/sites/integrations', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+      const out = await res.json();
+      CURRENT_SITE.integrations = out.integrations;
+      updateIntegrationBadges(out.integrations);
+      await fetchSwarmData();
+      notify(`Saved GSC, GA4 & Bing integrations for ${CURRENT_SITE.domain}!`);
+    }
+
+    async function loadLearnedPrompts() {
+      const res = await fetch('/api/agent-prompts');
+      const data = await res.json();
+      renderLearnedPrompts(data.prompts);
+    }
+
+    function renderLearnedPrompts(prompts) {
+      document.getElementById('learnedPromptsList').innerHTML = prompts.map(p => `
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-slate-900 dark:text-white text-sm">${p.title}</div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 dark:bg-indigo-950 text-brand-600 dark:text-indigo-300">Agent: ${p.agent_id}</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-600">${p.scope}</span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">${p.prompt_text}</p>
+        </div>
+      `).join('');
+    }
+
+    async function addAgentPrompt() {
+      const title = document.getElementById('learnTitle').value.trim();
+      const text = document.getElementById('learnText').value.trim();
+      if (!title || !text) {
+        notify('Please enter both a prompt title and instructions.');
+        return;
+      }
+      const res = await fetch('/api/agent-prompts', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          agent_id: document.getElementById('learnAgentId').value,
+          title: title,
+          scope: document.getElementById('learnScope').value,
+          prompt_text: text
+        })
+      });
+      const data = await res.json();
+      renderLearnedPrompts(data.prompts);
+      document.getElementById('learnTitle').value = '';
+      document.getElementById('learnText').value = '';
+      await fetchSwarmData();
+      notify('New prompt saved to Agent Memory & applied!');
+    }
+
+    async function saveApiKeys() {
+      const payload = {
+        TYPESAFE_API_KEY: document.getElementById('keyTypesafe').value,
+        GEMINI_API_KEY: document.getElementById('keyGemini').value,
+        OPENAI_API_KEY: document.getElementById('keyOpenai').value,
+        GOOGLE_PAGESPEED_API_KEY: document.getElementById('keyPagespeed').value
+      };
+      const res = await fetch('/api/keys/save', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+      const out = await res.json();
+      const activeList = Object.entries(out.active).filter(([_, v]) => v).map(([k]) => k).join(', ');
+      document.getElementById('apiKeyStatusText').textContent = activeList
+        ? `Live Cloud Keys Active: ${activeList}`
+        : 'Running with calibrated local fallback.';
+      notify('AI Keys saved & activated!');
+      await fetchSwarmData();
+    }
+
+    function initHomeChart(traffic, aiSov) {
+      const ctx = document.getElementById('homeGrowthChart').getContext('2d');
+      if (homeChartInstance) homeChartInstance.destroy();
+      homeChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+          datasets: [
+            { label: 'GSC + Bing Clicks', data: traffic, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.35 },
+            { label: 'AI Recommendations (x100)', data: aiSov.map(x => x * 240), borderColor: '#10b981', borderDash: [5, 5], fill: false, tension: 0.35 }
+          ]
+        },
+        options: {
+          plugins: { legend: { labels: { color: '#64748b' } } },
+          scales: { x: { ticks: { color: '#64748b' } }, y: { ticks: { color: '#64748b' } } }
+        }
+      });
+    }
+
+    async function fetchSwarmData() {
+      if (!CURRENT_SITE) return;
+      const kw = document.getElementById('inputKeyword').value || 'automated workflow operations software';
+      const title = kw.slice(0, 42).replace(/\b\w/g, c => c.toUpperCase()) + ' (2026 Guide)';
+      const res = await fetch('/api/run-pipeline', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          site_id: CURRENT_SITE.id,
+          primary_keyword: kw,
+          article_title: title,
+          page_type: document.getElementById('inputPageType').value,
+          publish_mode: 'draft',
+          simulate_failure: document.getElementById('simulateFailureToggle').checked
+        })
+      });
+      SWARM_DATA = await res.json();
+      document.getElementById('sidebarLogBadge').textContent = SWARM_DATA.task_logs.length;
+      renderAgentSidebarList();
+      renderAllPrimaryViews();
+      if (ACTIVE_NAV.startsWith('A')) {
+        renderSingleAgentView(ACTIVE_NAV);
+      }
+    }
+
+    function renderAgentSidebarList() {
+      const agents = Object.values(SWARM_DATA.workspaces);
+      document.getElementById('agentSidebarItems').innerHTML = agents.map(a => {
+        const dot = a.had_initial_failure ? 'bg-amber-500' : 'bg-emerald-500';
+        const isSelected = ACTIVE_NAV === a.id;
+        const cls = isSelected
+          ? "agent-nav-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white"
+          : "agent-nav-btn w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50";
+        return `
+          <button onclick="selectNav('${a.id}')" id="nav-${a.id}" class="${cls}">
+            <span class="truncate pr-2"><strong class="font-mono text-slate-400 mr-1">${a.num}.</strong>${a.name}</span>
+            <span id="dot-${a.id}" class="w-2 h-2 rounded-full shrink-0 ${dot}"></span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectNav(navId) {
+      ACTIVE_NAV = navId;
+      toggleMobileSidebar(false);
+      document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+
+      document.querySelectorAll('.main-nav-btn').forEach(b => {
+        if (b.id === 'nav-INTEGRATIONS') {
+          b.className = "main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-between text-brand-600 dark:text-indigo-400 hover:bg-brand-50/60 dark:hover:bg-slate-800/50";
+        } else {
+          b.className = "main-nav-btn w-full text-left px-3 py-2 rounded-xl font-medium flex items-center justify-start gap-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50";
+        }
+      });
+
+      document.querySelectorAll('.agent-nav-btn').forEach(b => {
+        b.className = "agent-nav-btn w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between text-slate-600 dark:text-slate-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/50";
+      });
+
+      const btn = document.getElementById('nav-' + navId);
+      if (btn) {
+        btn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-900', 'dark:text-white', 'font-semibold');
+      }
+
+      const metaMap = {
+        HOME: {icon: '⊞', title: `${CURRENT_SITE.site_name} Growth Center`, sub: 'Hybrid TypeSafe Jev + LLM autonomous progress'},
+        INTEGRATIONS: {icon: '🔗', title: `Site Integrations (${CURRENT_SITE.domain})`, sub: 'Connect Google Search Console, GA4 & Bing Webmaster Tools for this website profile'},
+        LEARNING: {icon: '🧠', title: 'Agent Prompt Learning Studio', sub: '10 Master Prompts active — Add custom SEO, AEO & CRO rules'},
+        ANALYTICS: {icon: '📊', title: 'Analytics & Jev 3-Bucket Miner', sub: 'GSC & Bing queries classified by TypeSafe Jev choice'},
+        AI_VISIBILITY: {icon: '👁', title: 'AI Search Visibility', sub: 'See how ChatGPT (via Bing), Google AI Overview & Gemini recommend your brand'},
+        TECH_SEO: {icon: '>_', title: 'Technical SEO, Bing IndexNow & Schema', sub: 'Page speed, AI crawler permissions, Bing IndexNow, and Google FAQ Schema'},
+        WEBSITE_AUDIT: {icon: '📄', title: 'Website Audit & Jev Spam Firewall', sub: 'On-Page SEO, Internal Link Builder, and Jev Noul AdSense checks'},
+        KEYWORDS_CONTENT: {icon: '✎', title: 'Keywords & Content Studio', sub: 'Easy-to-rank keywords and automatic article generator'},
+        SETTINGS: {icon: '⚙', title: 'Settings, AI Keys & Publish Queue', sub: 'Enter your TypeSafe Jev / Gemini API keys and publish finished pages'},
+        LOGS: {icon: '📋', title: 'Master Agent Task Audit Logs', sub: 'Plain-English log of every task run by Agents 01–16 and Jev job transfers'}
+      };
+
+      if (metaMap[navId]) {
+        document.getElementById('headerIconBox').textContent = metaMap[navId].icon;
+        document.getElementById('headerTitle').textContent = metaMap[navId].title;
+        document.getElementById('headerSubtitle').textContent = metaMap[navId].sub;
+        document.getElementById('view-' + navId).classList.remove('hidden');
+      } else if (navId.startsWith('A')) {
+        const ag = SWARM_DATA.workspaces[navId];
+        document.getElementById('headerIconBox').textContent = ag.num;
+        document.getElementById('headerTitle').textContent = `Agent ${ag.num}: ${ag.name}`;
+        document.getElementById('headerSubtitle').textContent = ag.plain_summary;
+        document.getElementById('view-AGENT').classList.remove('hidden');
+        renderSingleAgentView(navId);
+      }
+    }
+
+    function renderAllPrimaryViews() {
+      const ws = SWARM_DATA.workspaces;
+      document.getElementById('homeRecentLogs').innerHTML = SWARM_DATA.supervisor_transfers.length
+        ? SWARM_DATA.supervisor_transfers.map(t => `
+          <div onclick="selectNav('A16')" class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 cursor-pointer space-y-1">
+            <div class="font-bold text-amber-800 dark:text-amber-300">${t.title}</div>
+            <div class="text-slate-600 dark:text-slate-300">${t.badge}</div>
+          </div>
+        `).join('')
+        : '<div class="text-emerald-600 font-semibold">All 16 agents passed with zero errors.</div>';
+
+      document.getElementById('analyticsBucketsCards').innerHTML = renderVisualCardList(ws.A3.cards);
+      document.getElementById('aiVisCardsList').innerHTML = renderVisualCardList(ws.A10.cards);
+      document.getElementById('techHealthyCard').innerHTML = renderVisualCardList(ws.A6.cards);
+      document.getElementById('auditOnpageList').innerHTML = renderVisualCardList(ws.A5.cards);
+      document.getElementById('auditComplianceList').innerHTML = renderVisualCardList(ws.A9.cards);
+      document.getElementById('auditLinksList').innerHTML = renderVisualCardList(ws.A8.cards);
+      document.getElementById('kwCardsList').innerHTML = renderVisualCardList(ws.A1.cards);
+      document.getElementById('kwArticlePreview').innerHTML = SWARM_DATA.clean_article.content_html;
+      document.getElementById('settingsQueueList').innerHTML = renderVisualCardList(ws.A7.cards);
+      renderMasterLogs('ALL');
+    }
+
+    function triggerSimulatedAuditCrash() {
+      document.getElementById('techHealthyCard').classList.add('hidden');
+      document.getElementById('techErrorStateCard').classList.remove('hidden');
+      notify('Simulated Technical Audit Error');
+    }
+
+    function healTechnicalAudit() {
+      document.getElementById('techErrorStateCard').classList.add('hidden');
+      document.getElementById('techHealthyCard').classList.remove('hidden');
+      notify('Agent 16 (Jev Router) repaired the timeout & unlocked AI bots!');
+    }
+
+    function renderMasterLogs(filterStatus) {
+      const rows = SWARM_DATA.task_logs.filter(l => filterStatus === 'ALL' || l.status === filterStatus);
+      document.getElementById('masterLogsCardList').innerHTML = rows.map(l => {
+        const badge = l.status === 'SUCCEEDED' || l.status === 'HEALED'
+          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+          : (l.status === 'FAILED' ? 'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800' : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800');
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${badge}">${l.status}</span>
+                <button onclick="selectNav('${l.agent_id}')" class="font-bold text-brand-600 dark:text-indigo-400 hover:underline text-sm">
+                  ${l.agent_id}: ${l.agent_name}
+                </button>
+                <span class="text-slate-400 font-mono text-[11px]">• ${l.timestamp} (${l.ms})</span>
+              </div>
+              <div class="font-semibold text-slate-800 dark:text-slate-200">${l.task}</div>
+              <div class="text-slate-600 dark:text-slate-400">${l.detail}</div>
+              ${l.transferred_to !== '—' ? `<div class="text-amber-600 dark:text-amber-400 font-semibold">↳ Agent 16 (Jev Choice) Transferred Job To: ${l.transferred_to}</div>` : ''}
+            </div>
+            <button onclick="selectNav('${l.agent_id}')" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-semibold px-3 py-1.5 rounded-xl shrink-0 self-start sm:self-center">
+              Open Agent →
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSingleAgentView(agentId) {
+      const ag = SWARM_DATA.workspaces[agentId];
+      document.getElementById('agPillarTag').textContent = `Agent ${ag.num} • ${ag.pillar}`;
+      const st = document.getElementById('agStatusTag');
+      if (ag.had_initial_failure) {
+        st.textContent = 'Mistake Caught & Fixed Automatically by Jev (Agent 16) ✓';
+        st.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-200';
+      } else {
+        st.textContent = 'Working & Completed Successfully ✓';
+        st.className = 'text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200';
+      }
+      document.getElementById('agHeading').textContent = `Agent ${ag.num}: ${ag.name}`;
+      document.getElementById('agPlainSummary').textContent = ag.plain_summary;
+
+      document.getElementById('agKpiCards').innerHTML = ag.kpis.map(k => `
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="text-xs text-slate-500">${k.label}</div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">${k.value}</div>
+          <div class="text-xs text-brand-600 dark:text-indigo-400 font-medium mt-1">${k.sub}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('agVisualCardsBox').innerHTML = renderVisualCardList(ag.cards);
+
+      const logs = SWARM_DATA.task_logs.filter(l => l.agent_id === agentId || (agentId === 'A16' && l.status !== 'SUCCEEDED'));
+      document.getElementById('agLogsList').innerHTML = logs.map(l => {
+        const badge = l.status === 'SUCCEEDED' || l.status === 'HEALED'
+          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+          : (l.status === 'FAILED' ? 'bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-300' : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300');
+        return `
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded font-bold text-[10px] ${badge}">${l.status}</span>
+                <strong class="text-slate-900 dark:text-white">${l.task}</strong>
+              </div>
+              <div class="text-slate-600 dark:text-slate-300">${l.detail}</div>
+            </div>
+            <span class="font-mono text-slate-400 text-[11px] shrink-0">${l.timestamp} • ${l.ms}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function runVisualSequence() {
+      const btnText = document.getElementById('runSwarmBtnText');
+      btnText.textContent = 'Running 16 Agents...';
+      await fetchSwarmData();
+      const ids = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16'];
+      for (const id of ids) {
+        const dot = document.getElementById('dot-' + id);
+        if (dot) dot.className = 'w-2.5 h-2.5 rounded-full bg-brand-600 animate-ping';
+        await new Promise(r => setTimeout(r, 55));
+        if (dot) {
+          const hadFail = SWARM_DATA.workspaces[id]?.had_initial_failure;
+          dot.className = `w-2 h-2 rounded-full ${hadFail ? 'bg-amber-500' : 'bg-emerald-500'}`;
+        }
+      }
+      btnText.textContent = 'Run All 16 Agents Live';
+      notify('All 16 Agents executed & verified by TypeSafe Jev!');
+    }
+
+    function toggleModal(show) {
+      const m = document.getElementById('siteModal');
+      m.classList.toggle('hidden', !show);
+      m.classList.toggle('flex', show);
+    }
+
+    async function createSite() {
+      const payload = {
+        domain: document.getElementById('mDomain').value || 'newproject.com',
+        site_name: document.getElementById('mName').value || 'New Project',
+        tech_stack: document.getElementById('mStack').value,
+        niche: document.getElementById('mNiche').value || 'Commercial Services',
+        editorial_role: 'Editorial Strategy Board',
+        eeat_credentials: 'Verified Industry Specialists',
+        proprietary_data_notes: document.getElementById('mNotes').value || '2026 Empirical Benchmark Dataset'
+      };
+      await fetch('/api/sites', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
+      toggleModal(false);
+      await loadSites();
+      notify(`Added website ${payload.domain}`);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadSites);
+  </script>
+</body>
+</html>
